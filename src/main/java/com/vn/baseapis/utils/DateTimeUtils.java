@@ -8,9 +8,9 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 
 public class DateTimeUtils {
+    public static final String DATE_FORMAT = "dd/MM/yyyy";
     public static final String DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm:ss";
     private static final String ZONE_ID_7 = "UTC+07:00"; // Asia/Ho_Chi_Minh
-    private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     private static final DateTimeFormatter vnFormatter = DateTimeFormatter
             .ofLocalizedDateTime(FormatStyle.MEDIUM)
