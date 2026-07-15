@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: base-apis
+  servlet:
+    multipart:
+      # Nới giới hạn upload để import được file Excel lớn (mặc định chỉ 1MB/file, 10MB/request)
+      max-file-size: 100MB
+      max-request-size: 100MB
