@@ -4,6 +4,7 @@ import com.vn.baseapis.dto.request.UserImportDTO;
 import com.vn.baseapis.service.io.exporter.user.UserExportService;
 import com.vn.baseapis.service.io.importer.user.UserImportService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,16 +27,11 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/users/export")
+@RequiredArgsConstructor
 public class UserExportController {
 
     private final UserExportService userExportService;
     private final UserImportService userImportService;
-
-    public UserExportController(UserExportService userExportService,
-                               UserImportService userImportService) {
-        this.userExportService = userExportService;
-        this.userImportService = userImportService;
-    }
 
     @GetMapping("/small")
     public void exportSmall(HttpServletResponse response) throws IOException {
