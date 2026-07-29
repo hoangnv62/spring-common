@@ -6,7 +6,7 @@ public record UserImportDTO(
         Long id,
         String fullName,
         String email,
-        int age,
+        Integer age,
         BigDecimal balance,
         boolean active
 ) {

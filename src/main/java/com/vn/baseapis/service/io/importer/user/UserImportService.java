@@ -21,10 +21,10 @@ public class UserImportService {
      */
     private static final UserExcelRowMapper USER_MAPPER = new UserExcelRowMapper();
 
-    public List<UserImportDTO> importUsers(InputStream in) throws IOException {
+    public void importUsers(InputStream in) throws IOException {
         // headerRows = 1: bỏ qua đúng dòng tiêu đề cột của file "small"/"large".
         StreamExcelImporter<UserImportDTO> importer = new StreamExcelImporter<>(USER_MAPPER);
-        return importer.importAll(in);
+        importer.importAll(in);
     }
 
 }

@@ -1,3 +1,18 @@
+server:
+  # Bật Tomcat RemoteIpValve: nó bóc X-Forwarded-For để request.getRemoteAddr() trả về IP client thật.
+  # Chỉ tin header khi peer kết nối trực tiếp thuộc internal-proxies bên dưới, nên client cuối
+  # không thể giả mạo header để lách rate limit. Đặt "none" nếu app không đứng sau proxy nào.
+  forward-headers-strategy: ${FORWARD_HEADERS_STRATEGY:native}
+  tomcat:
+    remoteip:
+      # Mặc định của Spring Boot: dải private/loopback/CGNAT + IPv6 link-local & unique-local.
+      # Khi đã biết IP cụ thể của reverse proxy (nginx/LB), nên siết lại đúng IP đó để an toàn hơn,
+      # đặc biệt với môi trường container/K8s vì mọi pod đều nằm trong dải private.
+      internal-proxies: ${TRUSTED_PROXY_REGEX:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|100\.6[4-9]{1}\.\d{1,3}\.\d{1,3}|100\.[7-9]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.1[0-1]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.12[0-7]{1}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1|::1|fe[89ab]\p{XDigit}:.*|f[cd]\p{XDigit}{2}+:.*}
+  port: 8080
+  servlet:
+    context-path: /common-api
+
 spring:
   application:
     name: base-apis
@@ -6,3 +21,40 @@ spring:
       # Nới giới hạn upload để import được file Excel lớn (mặc định chỉ 1MB/file, 10MB/request)
       max-file-size: 100MB
       max-request-size: 100MB
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/base_apis}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      # Dùng chung cho cache (@Cacheable) và bucket rate limit
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      timeout: 2s
+  cache:
+    type: redis
+    redis:
+      # TTL mặc định cho mọi @Cacheable. Không đặt thì entry cache sống mãi trong Redis.
+      time-to-live: ${CACHE_TTL:30m}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+app:
+  rate-limit:
+    # true: Redis lỗi thì vẫn cho request đi qua (ưu tiên khả dụng, rate limit tạm mất hiệu lực)
+    # false: Redis lỗi thì từ chối request
+    fail-open: ${RATE_LIMIT_FAIL_OPEN:true}
+  security:
+    authentication:
+      jwt:
+        base64-secret: H+FtQksllnPVgdl7v1ERls5/x/cAY7YKnRqKY1eekYrKYF0ktPHqjul8sSdrsBaY
+        token-validity-in-seconds: 86400
+        refresh-token-validity-in-seconds: 2592000
