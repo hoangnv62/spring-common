@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Claude Code ###
+# Quyền/cấu hình cá nhân cho máy của từng người.
+# .claude/settings.json (cấu hình dùng chung cho team) thì vẫn commit.
+.claude/settings.local.json
