@@ -47,12 +47,12 @@ public class UserExportService {
      */
     private static final List<ExcelColumn<UserResponseDTO>> COLUMNS = List.of(
             ExcelColumn.of(ID_COLUMN, UserResponseDTO::id).width(8),
-            ExcelColumn.of(NAME_COLUMN, UserResponseDTO::fullName).width(25),
-            ExcelColumn.of(EMAIL_COLUMN, UserResponseDTO::email).width(30),
-            ExcelColumn.of(AGE_COLUMN, UserResponseDTO::age).width(8),
-            ExcelColumn.of(BALANCE_COLUMN, UserResponseDTO::balance).width(15),
-            ExcelColumn.of(ACTIVE_COLUMN, UserResponseDTO::active).width(12),
-            ExcelColumn.of(DATE_CREATED_COLUMN, UserResponseDTO::createdAt).width(20)
+            ExcelColumn.of(NAME_COLUMN, UserResponseDTO::fullName),
+            ExcelColumn.of(EMAIL_COLUMN, UserResponseDTO::email),
+            ExcelColumn.of(AGE_COLUMN, UserResponseDTO::age),
+            ExcelColumn.of(BALANCE_COLUMN, UserResponseDTO::balance),
+            ExcelColumn.of(ACTIVE_COLUMN, UserResponseDTO::active),
+            ExcelColumn.of(DATE_CREATED_COLUMN, UserResponseDTO::createdAt)
     );
 
     /**

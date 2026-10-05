@@ -85,8 +85,8 @@ public abstract class AbstractExcelExporter<T> implements IExcelExporter<T> {
 
     @Override
     public void export(Iterable<? extends T> data, OutputStream out) throws IOException {
-        Workbook workbook = createWorkbook();
-        try {
+        // try-with-resources: với SXSSF, close() cũng tự xoá các file tạm trên đĩa
+        try (Workbook workbook = createWorkbook()) {
             Sheet sheet = workbook.createSheet(sheetName);
             ExcelStyles styles = new ExcelStyles(workbook);
 
@@ -109,8 +109,6 @@ public abstract class AbstractExcelExporter<T> implements IExcelExporter<T> {
 
             workbook.write(out);
             out.flush();
-        } finally {
-            workbook.close(); // với SXSSF, close() cũng tự xoá các file tạm trên đĩa
         }
     }
 

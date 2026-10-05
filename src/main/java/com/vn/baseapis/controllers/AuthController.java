@@ -1,16 +1,22 @@
 package com.vn.baseapis.controllers;
 
 import com.vn.baseapis.config.IpRateLimited;
+import com.vn.baseapis.domain.User;
 import com.vn.baseapis.dto.request.LoginRequestDTO;
 import com.vn.baseapis.dto.request.RefreshTokenRequest;
 import com.vn.baseapis.dto.response.TokenResponse;
+import com.vn.baseapis.repository.UserRepository;
 import com.vn.baseapis.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -18,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-
     /**
      * Đăng nhập bằng email/password, trả về cặp access/refresh token.
      * Trả 401 nếu sai thông tin đăng nhập.
@@ -26,8 +31,8 @@ public class AuthController {
      */
     @PostMapping("/login")
     @IpRateLimited(limit = 5, durationSeconds = 60)
-    public TokenResponse login(@Valid @RequestBody LoginRequestDTO request) {
-        return authService.login(request);
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequestDTO request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 
     /**
