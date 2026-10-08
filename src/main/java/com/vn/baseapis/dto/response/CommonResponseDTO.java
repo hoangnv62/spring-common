@@ -1,17 +1,16 @@
 package com.vn.baseapis.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponseDTO {
-    Long id;
-    String fullName;
-    String email;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CommonResponseDTO {
+    String response;
     String status;
-    String role;
 }

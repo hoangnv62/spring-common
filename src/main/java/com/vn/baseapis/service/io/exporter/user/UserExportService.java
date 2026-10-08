@@ -6,7 +6,7 @@ import com.vn.baseapis.service.io.exporter.ExcelDownload;
 import com.vn.baseapis.service.io.exporter.ExcelHeaders;
 import com.vn.baseapis.service.io.exporter.IExcelExporter;
 import com.vn.baseapis.service.io.exporter.StreamExcelExporter;
-import com.vn.baseapis.dto.response.UserResponseDTO;
+import com.vn.baseapis.dto.response.UserExportResponseDTO;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -45,22 +45,22 @@ public class UserExportService {
     /**
      * Định nghĩa cột dùng chung cho cả hai kịch bản export.
      */
-    private static final List<ExcelColumn<UserResponseDTO>> COLUMNS = List.of(
-            ExcelColumn.of(ID_COLUMN, UserResponseDTO::id).width(8),
-            ExcelColumn.of(NAME_COLUMN, UserResponseDTO::fullName),
-            ExcelColumn.of(EMAIL_COLUMN, UserResponseDTO::email),
-            ExcelColumn.of(AGE_COLUMN, UserResponseDTO::age),
-            ExcelColumn.of(BALANCE_COLUMN, UserResponseDTO::balance),
-            ExcelColumn.of(ACTIVE_COLUMN, UserResponseDTO::active),
-            ExcelColumn.of(DATE_CREATED_COLUMN, UserResponseDTO::createdAt)
+    private static final List<ExcelColumn<UserExportResponseDTO>> COLUMNS = List.of(
+            ExcelColumn.of(ID_COLUMN, UserExportResponseDTO::id).width(8),
+            ExcelColumn.of(NAME_COLUMN, UserExportResponseDTO::fullName),
+            ExcelColumn.of(EMAIL_COLUMN, UserExportResponseDTO::email),
+            ExcelColumn.of(AGE_COLUMN, UserExportResponseDTO::age),
+            ExcelColumn.of(BALANCE_COLUMN, UserExportResponseDTO::balance),
+            ExcelColumn.of(ACTIVE_COLUMN, UserExportResponseDTO::active),
+            ExcelColumn.of(DATE_CREATED_COLUMN, UserExportResponseDTO::createdAt)
     );
 
     /**
      * Export ~1000 bản ghi (giữ toàn bộ trong RAM).
      */
     public void exportSmall(HttpServletResponse response) throws IOException {
-        List<UserResponseDTO> users = fakeUsers(1_000).toList();
-        IExcelExporter<UserResponseDTO> exporter = new BaseExcelExporter<>(COLUMNS, "Người dùng");
+        List<UserExportResponseDTO> users = fakeUsers(1_000).toList();
+        IExcelExporter<UserExportResponseDTO> exporter = new BaseExcelExporter<>(COLUMNS, "Người dùng");
         ExcelDownload.to(response, "users-small", exporter, users);
     }
 
@@ -69,8 +69,8 @@ public class UserExportService {
      */
     public void exportLarge(HttpServletResponse response) throws IOException {
         // Không gọi toList() — để Stream sinh từng bản ghi khi exporter duyệt, tránh nạp hết vào RAM.
-        Iterable<UserResponseDTO> users = () -> fakeUsers(100_000).iterator();
-        IExcelExporter<UserResponseDTO> exporter = new StreamExcelExporter<>(COLUMNS, "Người dùng");
+        Iterable<UserExportResponseDTO> users = () -> fakeUsers(100_000).iterator();
+        IExcelExporter<UserExportResponseDTO> exporter = new StreamExcelExporter<>(COLUMNS, "Người dùng");
         ExcelDownload.to(response, "users-large", exporter, users);
     }
 
@@ -80,10 +80,10 @@ public class UserExportService {
      * exporter tự dịch xuống theo số dòng trả về.
      */
     public void exportWithCustomHeader(HttpServletResponse response) throws IOException {
-        List<UserResponseDTO> users = fakeUsers(1_000).toList();
+        List<UserExportResponseDTO> users = fakeUsers(1_000).toList();
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        IExcelExporter<UserResponseDTO> exporter =
+        IExcelExporter<UserExportResponseDTO> exporter =
                 new BaseExcelExporter<>(COLUMNS, "Người dùng") {
                     @Override
                     protected int writeCustomHeader(Sheet sheet, Workbook workbook) {
@@ -109,12 +109,12 @@ public class UserExportService {
     /**
      * Sinh một Stream lười gồm {@code count} người dùng giả, id chạy từ 1..count.
      */
-    private Stream<UserResponseDTO> fakeUsers(int count) {
+    private Stream<UserExportResponseDTO> fakeUsers(int count) {
         LocalDateTime base = LocalDateTime.now();
         return IntStream.rangeClosed(1, count).mapToObj(i -> fakeUser(i, base));
     }
 
-    private UserResponseDTO fakeUser(long id, LocalDateTime base) {
+    private UserExportResponseDTO fakeUser(long id, LocalDateTime base) {
         String fullName = HO[(int) (id * 7 % HO.length)]
                 + " " + DEM[(int) (id * 3 % DEM.length)]
                 + " " + TEN[(int) (id % TEN.length)];
@@ -123,6 +123,6 @@ public class UserExportService {
         BigDecimal balance = BigDecimal.valueOf(id * 123_457L % 1_000_000L, 2); // 2 chữ số thập phân
         boolean active = id % 2 == 0;
         LocalDateTime createdAt = base.minusMinutes(id);
-        return new UserResponseDTO(id, fullName, email, age, balance, active, createdAt);
+        return new UserExportResponseDTO(id, fullName, email, age, balance, active, createdAt);
     }
 }

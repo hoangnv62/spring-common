@@ -1,5 +1,8 @@
 package com.vn.baseapis.utils;
 
+import com.vn.baseapis.constants.ApiResponseCode;
+import com.vn.baseapis.dto.response.DateRangeResponseDTO;
+import com.vn.baseapis.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.*;
@@ -20,6 +23,7 @@ public class DateTimeUtils {
     public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     public static final ZoneId zoneId7 = ZoneId.of(ZONE_ID_7);
+
     public static LocalDate toLocalDate(Instant instant) {
         if (instant == null) {
             return null;
@@ -47,6 +51,14 @@ public class DateTimeUtils {
 
         // Convert LocalDateTime to Instant (assuming UTC offset)
         return zonedDateTime.toInstant();
+    }
+
+    public static DateRangeResponseDTO toDateRange(String dateFrom, String dateTo) {
+        Instant dateFromInstant = toInstantStart(dateFrom);
+        Instant dateToInstant = toInstantEnd(dateTo);
+        if (dateFromInstant != null && dateToInstant != null && dateFromInstant.isAfter(dateToInstant))
+            throw new BusinessException(ApiResponseCode.BAD_REQUEST, "Thời gian bắt đầu phải nằm trước thời gian kết thúc");
+        return new DateRangeResponseDTO(dateFromInstant, dateToInstant);
     }
 
     public static Instant toInstantEnd(String dateString) {
@@ -85,6 +97,7 @@ public class DateTimeUtils {
     public static LocalDateTime toLocalDateTime(String dateString) {
         return StringUtils.isBlank(dateString) ? null : LocalDateTime.parse(dateString, dateTimeFormatter);
     }
+
     public static long localDateToMillis(LocalDate localDate) {
         return localDate.atStartOfDay(ZoneId.of(String.valueOf(zoneId7))).toInstant().toEpochMilli();
     }
